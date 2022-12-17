@@ -15,46 +15,48 @@ datasource db {
 }
 
 model Bet {
-  id String @id @default(cuid())
-  title String
-  code String @unique
+  id        String   @id @default(cuid())
+  title     String
+  code      String   @unique
   createdAt DateTime @default(now())
-  ownerId String?
- 
+  ownerId   String?
 
-  owner User? @relation(fields: [ownerId], references: [id])
+  owner        User?         @relation(fields: [ownerId], references: [id])
   participants Participant[]
 }
 
 model Participant {
-  id String @id @default(cuid())
+  id     String @id @default(cuid())
   userId String
-  betId String
+  betId  String
 
   guesses Guess[]
-  user User @relation(fields: [userId], references: [id])
-  bet Bet @relation(fields: [betId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  bet     Bet     @relation(fields: [betId], references: [id])
 
   @@unique([userId, betId])
 }
 
 model User {
-  id String @id @default(cuid())
-  name String
-  email String @unique
-  googleId String? @unique
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  googleId  String?  @unique
   avatarUrl String?
   createdAt DateTime @default(now())
 
-  ownBets Bet[]
+  address  Address?
+  document Document?
+
+  ownBets         Bet[]
   participatingAt Participant[]
 }
 
 model Game {
-  id String @id @default(cuid())
+  id   String   @id @default(cuid())
   date DateTime
 
-  firstTeamCounryCode String
+  firstTeamCounryCode  String
   secondTeamCounryCode String
 
   guesses Guess[]
@@ -63,12 +65,45 @@ model Game {
 model Guess {
   id String @id @default(cuid())
 
-  firstTeamPoints Int
+  firstTeamPoints  Int
   secondTeamPoints Int
-  createdAt DateTime @default(now())
-  gameId String
-  participantId String
+  createdAt        DateTime @default(now())
+  gameId           String
+  participantId    String
 
   participant Participant @relation(fields: [participantId], references: [id])
-  game Game @relation(fields: [gameId], references: [id])
+  game        Game        @relation(fields: [gameId], references: [id])
+
+  @@unique([participantId, gameId])
+}
+
+model Address {
+  id           String @id @default(cuid())
+  addressLine1 String
+  addressLine2 String
+  zipCode      String
+  neighborhood String
+  cityCode     String
+  cityName     String
+  State        String
+  AddressType  Int
+  country      String
+  complement   String
+
+  clientId String? @unique
+
+  client User? @relation(fields: [clientId], references: [id])
+}
+
+model Document {
+  id             String  @id @default(cuid())
+  documentFile   String
+  documentFormat Int
+  documentName   String
+  documentType   Int
+  description    String
+  expirationDate String
+  clientId       String? @unique
+
+  client User? @relation(fields: [clientId], references: [id])
 }
